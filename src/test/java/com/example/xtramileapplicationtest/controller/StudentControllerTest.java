@@ -62,8 +62,6 @@ class StudentControllerTest {
 
     @Test
     void testCreateStudentBadRequest() throws Exception  {
-        studentRepository.deleteAll();
-
         CreateStudentRequest request = new CreateStudentRequest();
         request.setId("");
         request.setNama_depan("");
@@ -87,17 +85,28 @@ class StudentControllerTest {
 
     @Test
     void testGetStudentsSuccess() throws Exception {
+        CreateStudentRequest request = new CreateStudentRequest();
+        request.setId("SVUGM0001");
+        request.setNama_depan("Niki");
+        request.setNama_belakang("Hidayati");
+        request.setTanggal_lahir("2000-01-01");
+
+        mockMvc.perform(
+                post("/api/student")
+                        .accept("application/json")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request))
+        );
         mockMvc.perform(
                 get("/api/students")
                 .contentType("application/json")
         ).andExpectAll(
                 status().isOk()
         ).andDo(result -> {
-            Response<GetStudentsResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+            GetStudentsResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
             });
 
             assertEquals(null, response.getError());
-            assertEquals(null, response.getData().getError());
         });
     }
 
